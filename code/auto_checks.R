@@ -134,7 +134,7 @@ for(i in 1:nrow(enfant_sep_loop)){
      enfant_sep_loop[["age_sep"]][i] %!in% temp$age_hh){
     
     id_enqueteur <- c(id_enqueteur, data[data$X_index == enfant_sep_loop[["X_parent_index"]][i],"global_enum_id"])
-    uuid <- c(uuid,enfant_sep_loop[["X_index"]][i])
+    uuid <- c(uuid,enfant_sep_loop[["X_submission__uuid"]][i])
     date_enquete <- c(date_enquete, data[data$X_index == enfant_sep_loop[["X_parent_index"]][i],"today"])
     start <- c(start, str_split(ymd_hms(data[data$X_index == enfant_sep_loop[["X_parent_index"]][i], "start"])," ") %>% 
                  map_chr(2))
@@ -145,7 +145,7 @@ for(i in 1:nrow(enfant_sep_loop)){
            enfant_sep_loop[["age_sep"]][i] %in% temp$age_hh){
     
     id_enqueteur <- c(id_enqueteur, data[data$X_index == enfant_sep_loop[["X_parent_index"]][i],"global_enum_id"])
-    uuid <- c(uuid,enfant_sep_loop[["X_index"]][i])
+    uuid <- c(uuid,enfant_sep_loop[["X_submission__uuid"]][i])
     date_enquete <- c(date_enquete, data[data$X_index == enfant_sep_loop[["X_parent_index"]][i],"today"])
     start <- c(start, str_split(ymd_hms(data[data$X_index == enfant_sep_loop[["X_parent_index"]][i], "start"])," ") %>% 
                  map_chr(2))
@@ -189,7 +189,7 @@ for(i in 1:nrow(nbre_pers_decedes_loop)){
   if(nbre_pers_decedes_loop$sexe_pers_decede[i] == "homme" &
      nbre_pers_decedes_loop$cause_deces[i] == "accouchement"){
     id_enqueteur <- c(id_enqueteur, data[data$X_index == nbre_pers_decedes_loop[["X_parent_index"]][i],"global_enum_id"])
-    uuid <- c(uuid,nbre_pers_decedes_loop[["X_index"]][i])
+    uuid <- c(uuid,nbre_pers_decedes_loop[["X_submission__uuid"]][i])
     date_enquete <- c(date_enquete, data[data$X_index == nbre_pers_decedes_loop[["X_parent_index"]][i],"today"])
     start <- c(start, str_split(ymd_hms(data[data$X_index == nbre_pers_decedes_loop[["X_parent_index"]][i], "start"])," ") %>% 
                  map_chr(2))
@@ -203,7 +203,7 @@ for(i in 1:nrow(nbre_pers_decedes_loop)){
   if(nbre_pers_decedes_loop$age_pers_decede[i] < 60 &
      nbre_pers_decedes_loop$cause_deces[i] == "viellesse"){
     id_enqueteur <- c(id_enqueteur, data[data$X_index == nbre_pers_decedes_loop[["X_parent_index"]][i],"global_enum_id"])
-    uuid <- c(uuid,nbre_pers_decedes_loop[["X_index"]][i])
+    uuid <- c(uuid,nbre_pers_decedes_loop[["X_submission__uuid"]][i])
     date_enquete <- c(date_enquete, data[data$X_index == nbre_pers_decedes_loop[["X_parent_index"]][i],"today"])
     start <- c(start, str_split(ymd_hms(data[data$X_index == nbre_pers_decedes_loop[["X_parent_index"]][i], "start"])," ") %>% 
                  map_chr(2))
