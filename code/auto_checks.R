@@ -1,8 +1,11 @@
 library(stringr)
 library(composr)
+library(lubridate)
+library(dplyr)
+library(purrr)
+source("./code/functions.R")
 
-`%!in%` = Negate(`%in%`)
-
+time_diff <- vector()
 id_enqueteur <- vector()
 uuid <- vector()
 date_enquete <- vector()
@@ -14,6 +17,7 @@ probleme <- vector()
 nb_autre <- 0
 nb_nsp <- 0
 nb_prefere_pas <- 0
+i <- 1
 
 data <- read.csv("./input/data.csv", 
                  na.strings = c(""," ","n/a","NA",NA),
@@ -35,6 +39,29 @@ sm_autre <- names(data)[grep(".[.]autre", names(data))]
 sm_nsp <- names(data)[grep(".[.](nsp|ne_sait_pas|je_ne_sais_pas)", names(data))]
 sm_prefere_pas <- names(data)[grep(".[.](prefere_pas|ne_souhaite_pas_repondre|je_prefere_ne_pas_repondre)", names(data))]
 
+data$starttime = ymd_hms(data[["start"]])
+data$endtime = ymd_hms(data[["end"]])
+
+
+list_data_byenum <- data %>% 
+  split(.$global_enum_id) %>%
+  map(~.[order(.$start),])
+
+results <- map(list_data_byenum, survey_tonext_loop,
+               i,"starttime", "endtime",
+               "mins","X_uuid"," | ", time_diff, uuid, id_enqueteur, 
+               "global_enum_id", date_enquete, "today", start, "start", nom_site, "liste_enquete", nom_question)
+
+results <- results[sapply(results, function(x) dim(x)[1]) > 0] %>% bind_rows()
+
+results <- results %>% mutate(
+  probleme = case_when(
+    between(diff, -5, 0) ~ "temps entre deux enquêtes successives court",
+    diff >0 ~ "l'enquete a commencé avant la fin de l'enquete precedente",
+    TRUE ~ "Rien a signalé"
+  )
+) %>% select(-diff) %>% filter(probleme == "temps entre deux enquêtes successives court")
+
 
 hh_membres_loop <- hh_membres_loop %>% mutate(
   age_hh_cat = case_when(
@@ -49,8 +76,8 @@ for(i in 1:nrow(data)){
   
   temp <- hh_membres_loop %>% filter(X_parent_index == i)
   
-  if(data[["sexe_chef_meg"]][i] %in% temp$sexe_hh & 
-     data[["age_chef_meg"]][i] %!in% temp$age_hh_cat &
+  if((data[["sexe_chef_meg"]][i] %!in% temp$sexe_hh | 
+     data[["age_chef_meg"]][i] %!in% temp$age_hh_cat) &
      !is.na(data[["sexe_chef_meg"]][i])){
     
     id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
@@ -60,28 +87,15 @@ for(i in 1:nrow(data)){
                  map_chr(2))
     nom_site <- c(nom_site, data[["liste_enquete"]][i])
     nom_question <- c(nom_question, "age_chef_meg")
-    probleme <- c(probleme, "age chef menage n est pas pris en compte dans la composition du ménage")
-  }else if(data[["sexe_chef_meg"]][i] %!in% temp$sexe_hh & 
-           data[["age_chef_meg"]][i] %in% temp$age_hh_cat &
-           !is.na(data[["sexe_chef_meg"]][i])){
-    
-    id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
-    uuid <- c(uuid,data[["X_uuid"]][i])
-    date_enquete <- c(date_enquete, data[["today"]][i])
-    start <- c(start, str_split(ymd_hms(data[["start"]][i])," ") %>% 
-                 map_chr(2))
-    nom_site <- c(nom_site, data[["liste_enquete"]][i])
-    nom_question <- c(nom_question, "sexe_chef_meg")
-    probleme <- c(probleme, "sexe chef menage n est pas pris en compte dans la composition du ménage")
+    probleme <- c(probleme, "age ou sex du chef menage n est pas pris en compte dans la composition du ménage")
   }
-  
 }
 
 for(i in 1:nrow(data)){
   
 temp <- hh_membres_loop %>% filter(X_parent_index == i)
 
-if(data[["sexe_enqueteur"]][i] %in% temp$sexe_hh & 
+if(data[["sexe_enqueteur"]][i] %!in% temp$sexe_hh | 
   data[["age_enquete"]][i] %!in% temp$age_hh){
   
   id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
@@ -91,20 +105,8 @@ if(data[["sexe_enqueteur"]][i] %in% temp$sexe_hh &
                map_chr(2))
   nom_site <- c(nom_site, data[["liste_enquete"]][i])
   nom_question <- c(nom_question, "age_enquete")
-  probleme <- c(probleme, "age enquete n est pas pris en compte dans la composition du ménage")
-} else if(data[["sexe_enqueteur"]][i] %!in% temp$sexe_hh & 
-          data[["age_enquete"]][i] %in% temp$age_hh){
-  
-  id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
-  uuid <- c(uuid,data[["X_uuid"]][i])
-  date_enquete <- c(date_enquete, data[["today"]][i])
-  start <- c(start, str_split(ymd_hms(data[["start"]][i])," ") %>% 
-               map_chr(2))
-  nom_site <- c(nom_site, data[["liste_enquete"]][i])
-  nom_question <- c(nom_question, "sexe_enqueteur")
-  probleme <- c(probleme, "sexe enquete n est pas pris en compte dans la composition du ménage")
+  probleme <- c(probleme, "age ou sex enquete n est pas pris en compte dans la composition du ménage")
 }
-
 }
 
 for(i in 1:nrow(data)){
@@ -514,12 +516,13 @@ for(i in 1:nrow(data)){
   nb_nsp <- 0
 }
 
+
 for(i in 1:nrow(data)){
   for(j in 1:length(data)){
-    if(!is.na(data[i,j]) & data[i,j] =="autre"){nb_autre <- nb_autre + 1}
+    if(!is.na(data[i,j]) & data[i,j] %in% c("autre")) nb_autre <- nb_autre + 1
   }
   for(z in 1:length(sm_autre)){
-    if(data[i,sm_autre[z]] == 1 & !is.na(data[i,sm_autre[z]])) nb_autre = nb_autre + 1
+    if(data[i,sm_autre[z]] == 1 & !is.na(data[i,sm_autre[z]])) nb_autre <- nb_autre + 1
   }
   if(nb_autre > 4){
     id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
@@ -535,4 +538,5 @@ for(i in 1:nrow(data)){
 }
 
 cleaning_log <- data.frame(id_enqueteur,uuid,date_enquete,start,nom_site,nom_question,probleme)
+cleaning_log <- rbind(results,cleaning_log)
 write.csv(cleaning_log, "./output/cleaning_log.csv")

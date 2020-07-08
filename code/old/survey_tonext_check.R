@@ -3,8 +3,8 @@ library(dplyr)
 library(purrr)
 source("./code/functions.R")
 
-data <- read.csv("./input/data.csv", sep = ";", 
-                 na.strings = c(""," ","n/a","NA",NA,"na"),
+data <- read.csv("./input/data.csv", 
+                 na.strings = c(""," ","n/a","NA",NA),
                  stringsAsFactors = F)
 
 
@@ -20,19 +20,25 @@ i <- 1
 time_diff <- vector("double")
 surveys_uuid <- vector("character")
 enum <- vector("character")
+date <- vector()
+start <- vector()
+nom_site <- vector()
+question <- vector()
 
 results <- map(list_data_byenum, survey_tonext_loop,
-    i,"starttime", "endtime","mins","X_uuid"," | ", time_diff, surveys_uuid, enum, "global_enum_id")
+    i,"starttime", "endtime",
+    "mins","X_uuid"," | ", time_diff, uuid, id_enqueteur, 
+    "global_enum_id", date_enquete, "today", start, "start", nom_site, "liste_enquete", nom_question)
 
 results <- results[sapply(results, function(x) dim(x)[1]) > 0] %>% bind_rows()
 
 results <- results %>% mutate(
-  issue = case_when(
-    between(diff, -5, 0) ~ "temps entre deux enquetes succesives court",
+  probleme = case_when(
+    between(diff, -5, 0) ~ "temps entre deux enquêtes successives court",
     diff >0 ~ "l'enquete a commencé avant la fin de l'enquete precedente",
     TRUE ~ "Rien a signalé"
   )
-)
+) %>% select(-diff) %>% filter(probleme == "temps entre deux enquêtes successives court")
 
 write.csv(results, "./output/results.csv")
 
