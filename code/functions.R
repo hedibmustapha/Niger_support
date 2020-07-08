@@ -33,3 +33,13 @@ survey_tonext_loop <- function(df, pointer, starttime,
   out <- data.frame(diff,uuid,enum)
   return(out)
 }
+
+
+time_check <- function(df, starttime, endtime, key){
+  check <- df %>% transmute(start = ymd_hms(df[[starttime]]), end = ymd_hms(df[[endtime]]),
+                            interview_duration = difftime(as.POSIXct(end), as.POSIXct(start), units = "mins"
+                            ),
+                            uuid = df[[key]]
+  )
+  return(check)
+}

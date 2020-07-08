@@ -4,7 +4,7 @@ library(purrr)
 source("./code/functions.R")
 
 data <- read.csv("./input/data.csv", sep = ";", 
-                 na.strings = c(""," ","n/a","NA",NA),
+                 na.strings = c(""," ","n/a","NA",NA,"na"),
                  stringsAsFactors = F)
 
 
