@@ -477,6 +477,51 @@ for(i in 1:nrow(data)){
 }
 
 for(i in 1:nrow(data)){
+  if(difftime(as.POSIXct(data[["endtime"]][i]), 
+              as.POSIXct(data[["starttime"]][i]), 
+              units = "mins") <= 20){
+    id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
+    uuid <- c(uuid,data[["X_uuid"]][i])
+    date_enquete <- c(date_enquete, data[["start"]][i])
+    start <- c(start, str_split(ymd_hms(data[["start"]][i])," ") %>% 
+                 map_chr(2))
+    nom_site <- c(nom_site, data[["liste_enquete"]][i])
+    nom_question <- c(nom_question, "nbre_accueil")
+    probleme <- c(probleme, "duree d enquete courte")
+  }
+}
+
+for(i in 1:nrow(data)){
+  if(difftime(as.POSIXct(data[["endtime"]][i]), 
+              as.POSIXct(data[["starttime"]][i]), 
+              units = "mins") > 90){
+    id_enqueteur <- c(id_enqueteur, data[["global_enum_id"]][i])
+    uuid <- c(uuid,data[["X_uuid"]][i])
+    date_enquete <- c(date_enquete, data[["start"]][i])
+    start <- c(start, str_split(ymd_hms(data[["start"]][i])," ") %>% 
+                 map_chr(2))
+    nom_site <- c(nom_site, data[["liste_enquete"]][i])
+    nom_question <- c(nom_question, "nbre_accueil")
+    probleme <- c(probleme, "duree d enquete longue")
+  }
+}
+
+
+for(i in 1:nrow(hh_membres_loop)){
+  if(as.character(hh_membres_loop[i,c("vaccination_carte","vaccin_rougeole",
+                                      "vaccin_bcg","vaccin_dtc3")]) %in% c("oui_avec_carte","non")){
+    id_enqueteur <- c(id_enqueteur, data[data$X_index == hh_membres_loop[["X_parent_index"]][i],"global_enum_id"])
+    uuid <- c(uuid,hh_membres_loop[["X_submission__uuid"]][i])
+    date_enquete <- c(date_enquete, data[data$X_index == hh_membres_loop[["X_parent_index"]][i],"today"])
+    start <- c(start, str_split(ymd_hms(data[data$X_index == hh_membres_loop[["X_parent_index"]][i], "start"])," ") %>% 
+                 map_chr(2))
+    nom_site <- c(nom_site, data[data$X_index == hh_membres_loop[["X_parent_index"]][i], "liste_enquete"])
+    nom_question <- c(nom_question, "vaccination_carte")
+    probleme <- c(probleme, "la carte de vaccination de l'enfant a été montré pour certaines questions mais pas d'autres")
+  }
+}
+
+for(i in 1:nrow(data)){
   for(j in 1:length(data)){
     if(!is.na(data[i,j]) & data[i,j] %in% c("nsp","ne_sait_pas","je_ne_sais_pas")) nb_prefere_pas <- nb_prefere_pas + 1
   }
