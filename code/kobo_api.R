@@ -1,12 +1,14 @@
 library(readxl)
+library(httr)
+library(jsonlite)
 source_url("https://raw.githubusercontent.com/ppsapkota/kobohr_apitoolbox/master/R/r_func_ps_kobo_utils.R")
 
 kobo_server_url<-"https://kobo.humanitarianresponse.info/"
 kc_server_url<-"https://kc.humanitarianresponse.info/"
 
-u <-"XXXXXXXXX"
-pw <-"XXXXXXXXX"  
-asset_uid <- "apjTsvk6rb7WuvbSaTGJ5t"
+u <-"djibokobo"
+pw <-"Zbarzbar"  
+asset_uid <- "awQKkpnqz4hHEnxbhJu4XZ"
 
 type <- "xls"
 lang <- "xml"
@@ -45,7 +47,7 @@ repeat{
 }
 
 
-data <- read_excel(tf,sheet = "Questionnaire MSNA Niger")
+data <- read_excel(tf,sheet = "NER2002_MSNA_diffa")
 hh_membres_loop <- read_excel(tf,sheet = "hh_membres_loop")
 enfant_sep_loop <- read_excel(tf,sheet = "enfant_sep_loop")
 nbre_pers_decedes_loop <- read_excel(tf,sheet = "repeat_nbre_pers_decedes")

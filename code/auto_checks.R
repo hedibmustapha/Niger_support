@@ -74,7 +74,7 @@ hh_membres_loop <- hh_membres_loop %>% mutate(
 
 for(i in 1:nrow(data)){
   
-  temp <- hh_membres_loop %>% filter(X_parent_index == i)
+  temp <- hh_membres_loop %>% filter(X_submission__uuid  == data[["X_uuid"]][i])
   
   if((data[["sexe_chef_meg"]][i] %!in% temp$sexe_hh | 
      data[["age_chef_meg"]][i] %!in% temp$age_hh_cat) &
@@ -93,7 +93,7 @@ for(i in 1:nrow(data)){
 
 for(i in 1:nrow(data)){
   
-temp <- hh_membres_loop %>% filter(X_parent_index == i)
+temp <- hh_membres_loop %>% filter(X_submission__uuid  == data[["X_uuid"]][i])
 
 if(data[["sexe_enqueteur"]][i] %!in% temp$sexe_hh | 
   data[["age_enquete"]][i] %!in% temp$age_hh){
