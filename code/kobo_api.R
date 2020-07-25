@@ -6,8 +6,8 @@ source_url("https://raw.githubusercontent.com/ppsapkota/kobohr_apitoolbox/master
 kobo_server_url<-"https://kobo.humanitarianresponse.info/"
 kc_server_url<-"https://kc.humanitarianresponse.info/"
 
-u <-"djibokobo"
-pw <-"Zbarzbar"  
+u <-"xffdjibokobox"
+pw <-"xfffZbarzbarx"  
 asset_uid <- "awQKkpnqz4hHEnxbhJu4XZ"
 
 type <- "xls"
@@ -47,20 +47,8 @@ repeat{
 }
 
 
-data <- read_excel(tf,sheet = "NER2002_MSNA_diffa")
-hh_membres_loop <- read_excel(tf,sheet = "hh_membres_loop")
-enfant_sep_loop <- read_excel(tf,sheet = "enfant_sep_loop")
-nbre_pers_decedes_loop <- read_excel(tf,sheet = "repeat_nbre_pers_decedes")
-nbre_pers_difficulte_loop <- read_excel(tf,sheet = "repeat_nbre_pers_difficulte")
-
-write.csv(data, "./temp/main.csv", row.names = F)
-write.csv(hh_membres_loop, file = "./temp/hh_membres_loop.csv", row.names = F)
-write.csv(enfant_sep_loop, file = "./temp/enfant_sep_loop.csv", row.names = F)
-write.csv(nbre_pers_decedes_loop, file = "./temp/nbre_pers_decedes_loop.csv", row.names = F)
-write.csv(nbre_pers_difficulte_loop, file = "./temp/nbre_pers_difficulte_loop.csv", row.names = F)
-
-data <- read.csv("./temp/main.csv", stringsAsFactors = F)
-hh_membres_loop <- read.csv("./temp/hh_membres_loop.csv", stringsAsFactors = F)
-enfant_sep_loop <- read.csv("./temp/enfant_sep_loop.csv", stringsAsFactors = F)
-nbre_pers_decedes_loop <- read.csv("./temp/nbre_pers_decedes_loop.csv", stringsAsFactors = F)
-nbre_pers_difficulte_loop <- read.csv("./temp/nbre_pers_difficulte_loop.csv", stringsAsFactors = F)
+data <- readxl::read_excel(tf, 1) %>% type_convert()
+hh_membres_loop <- read_excel(tf,sheet = "hh_membres_loop") %>% type_convert()
+enfant_sep_loop <- read_excel(tf,sheet = "enfant_sep_loop") %>% type_convert()
+nbre_pers_decedes_loop <- read_excel(tf,sheet = "repeat_nbre_pers_decedes") %>% type_convert()
+nbre_pers_difficulte_loop <- read_excel(tf,sheet = "repeat_nbre_pers_difficulte") %>% type_convert()
