@@ -1,13 +1,16 @@
 library(readxl)
 library(httr)
 library(jsonlite)
+library(devtools)
+library(dplyr)
+library(readr)
 source_url("https://raw.githubusercontent.com/ppsapkota/kobohr_apitoolbox/master/R/r_func_ps_kobo_utils.R")
 
 kobo_server_url<-"https://kobo.humanitarianresponse.info/"
 kc_server_url<-"https://kc.humanitarianresponse.info/"
 
-u <-"xffdjibokobox"
-pw <-"xfffZbarzbarx"  
+u <-"djibokobo"
+pw <-"Zbarzbar"  
 asset_uid <- "awQKkpnqz4hHEnxbhJu4XZ"
 
 type <- "xls"
